@@ -1,0 +1,1 @@
+# Core football analysis modules
