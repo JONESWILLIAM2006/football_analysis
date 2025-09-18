@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: football_mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - football_network
+
+  # Redis for Celery
+  redis:
+    image: redis:7.2-alpine
+    container_name: football_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - football_network
+
+  # Streamlit Web Application
+  web:
+    build: .
+    container_name: football_web
+    restart: unless-stopped
+    ports:
+      - "8501:8501"
+    environment:
+      - MONGODB_URL=mongodb://admin:password123@mongodb:27017/
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - ./outputs:/app/outputs
+      - ./animations:/app/animations
+      - ./heatmaps:/app/heatmaps
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - football_network
+
+  # Celery Worker for Background Processing
+  worker:
+    build: .
+    container_name: football_worker
+    restart: unless-stopped
+    command: celery -A football_analysis worker --loglevel=info
+    environment:
+      - MONGODB_URL=mongodb://admin:password123@mongodb:27017/
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - ./outputs:/app/outputs
+      - ./animations:/app/animations
+      - ./heatmaps:/app/heatmaps
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - football_network
+
+  # Celery Flower for Monitoring (Optional)
+  flower:
+    build: .
+    container_name: football_flower
+    restart: unless-stopped
+    command: celery -A football_analysis flower --port=5555
+    ports:
+      - "5555:5555"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+    networks:
+      - football_network
+
+volumes:
+  mongodb_data:
+
+networks:
+  football_network:
+    driver: bridge

@@ -1,0 +1,17 @@
+streamlit
+opencv-python
+ultralytics
+numpy
+scipy
+scikit-learn
+xgboost
+mlflow
+yt-dlp
+plotly
+pymongo
+celery
+redis
+pygame
+googletrans==4.0.0rc1
+streamlit-player
+lapx

@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  webapp:
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./outputs:/app/outputs
+      - ./highlights:/app/highlights
+      - ./animations:/app/animations
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - MONGODB_URL=mongodb://mongo:27017/
+    depends_on:
+      - redis
+      - mongo
+    command: streamlit run football_analysis_complete.py --server.port=8501 --server.address=0.0.0.0
+
+  worker:
+    build: .
+    volumes:
+      - ./outputs:/app/outputs
+      - ./highlights:/app/highlights
+      - ./animations:/app/animations
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - MONGODB_URL=mongodb://mongo:27017/
+    depends_on:
+      - redis
+      - mongo
+    command: celery -A football_analysis_complete worker --loglevel=info
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:

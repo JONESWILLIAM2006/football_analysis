@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  webapp:
+    build: 
+      context: .
+      dockerfile: Dockerfile.production
+    ports:
+      - "8501:8501"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - MONGODB_URL=mongodb://mongo:27017/
+    volumes:
+      - ./outputs:/app/outputs
+      - ./highlights:/app/highlights
+      - ./animations:/app/animations
+    depends_on:
+      - redis
+      - mongo
+    restart: unless-stopped
+
+  worker:
+    build: 
+      context: .
+      dockerfile: Dockerfile.production
+    command: celery -A football_analysis_enhanced worker --loglevel=info --concurrency=2
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - MONGODB_URL=mongodb://mongo:27017/
+    volumes:
+      - ./outputs:/app/outputs
+      - ./highlights:/app/highlights
+      - ./animations:/app/animations
+    depends_on:
+      - redis
+      - mongo
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password123
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - webapp
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
+
+networks:
+  default:
+    driver: bridge

@@ -1,0 +1,75 @@
+# Core ML/AI - Latest Models
+torch>=2.1.0
+ultralytics>=8.1.0
+onnxruntime-gpu>=1.17.0
+tensorrt>=8.6.0
+transformers>=4.36.0
+xgboost>=2.0.0
+scikit-learn>=1.4.0
+
+# Advanced Detection Models
+rt-detr>=0.1.0
+yolov10>=1.0.0
+
+# Computer Vision & Tracking
+opencv-python>=4.9.0
+mediapipe>=0.10.8
+rtmpose>=1.0.0
+bytetrack>=0.3.0
+strongsort>=1.0.0
+
+# Data Science & Analysis
+numpy>=1.26.0
+pandas>=2.1.0
+scipy>=1.11.0
+networkx>=3.2.0
+pykalman>=0.9.5
+
+# Geometry & Homography
+imutils>=0.5.4
+shapely>=2.0.0
+
+# Visualization & UI
+streamlit>=1.29.0
+plotly>=5.17.0
+pydeck>=0.8.1
+altair>=5.2.0
+d3py>=0.2.0
+
+# Web Framework & Real-time
+fastapi>=0.104.0
+uvicorn>=0.24.0
+websockets>=12.0.0
+socketio>=5.10.0
+
+# Database & Queue
+redis>=5.0.0
+pymongo>=4.6.0
+celery>=5.3.4
+kafka-python>=2.0.2
+
+# Storage & Export
+gridfs>=4.0.0
+minio>=7.2.0
+fpdf2>=2.7.0
+reportlab>=4.0.0
+
+# Audio & TTS
+pydub>=0.25.0
+gtts>=2.4.0
+speechrecognition>=3.10.0
+
+# MLOps & Monitoring
+mlflow>=2.8.0
+wandb>=0.16.0
+prometheus-client>=0.19.0
+
+# Optimization & Deployment
+onnx>=1.15.0
+openvino>=2023.3.0
+docker>=7.0.0
+kubernetes>=28.1.0
+
+# Security & Auth
+cryptography>=41.0.0
+pyjwt>=2.8.0
